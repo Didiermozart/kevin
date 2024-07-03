@@ -74,15 +74,6 @@ def get_all_recipes(shortList=[], url=None):
         get_all_recipes(shortList, nextUrl)
 
 
-
-### VERSION KID
-# if __name__ == "__main__":
-#     nationalities = ["RU", "FR"]
-
-#     for nationality in nationalities: 
-#         url = f"https://ws-public.interpol.int/notices/v1/red?nationality={nationality}&page=1&resultPerPage=10"
-#         list = get_all_recipes(url=url)
-
 ### VERSION ROOKY
 def fetch_data(nationality):
     url = f"https://ws-public.interpol.int/notices/v1/red?nationality={nationality}&page=1&resultPerPage=10"
@@ -93,11 +84,11 @@ def fetch_data(nationality):
 
 if __name__ == "__main__":
     nationalities = ["RU", "FR"]
-    
+    mode = "KID"
+
     if mode == "KID":
         for nationality in nationalities:
             result = fetch_data(nationality)
-
     else:
         # Utilisation d'un pool de processus
         with multiprocessing.Pool(processes=len(nationalities)) as pool:
