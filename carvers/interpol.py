@@ -11,8 +11,6 @@ from urllib.parse import urlparse, urlunparse
 from scraperSeleniun import *
 
 
-url = "https://ws-public.interpol.int/notices/v1/red?nationality=RU&page=1&resultPerPage=100"
-
 def get_images(thumbnail_url, person_name):
     """
     get all images via thumbnail link
