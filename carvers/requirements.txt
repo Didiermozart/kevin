@@ -1,0 +1,6 @@
+newspaper3k
+selenium
+beautifulsoup4
+Pillow
+cloudscraper
+pandas

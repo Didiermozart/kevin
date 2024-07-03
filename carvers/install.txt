@@ -1,0 +1,20 @@
+Install dependencies
+
+_Chromedriver package_
+
+''' apt install chromium-chromedriver
+
+_Check path_
+
+''' \>$ whereis chromedriver
+''' chromedriver: /usr/bin/chromedriver
+
+
+_Install nltk dataset_
+full documentation here [https://www.nltk.org/data.html].
+It will open a TK console to manage and download all datasets as needed.
+
+Run as python interpreter:
+    >>> import nltk
+    >>> nltk.download()
+
