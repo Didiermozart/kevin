@@ -18,7 +18,7 @@ class urls():
         articles = list()
         
     web = {
-        "collas" : {
+        "interpol" : {
         "interpol notices rouges ":"https://www.interpol.int/fr/Notre-action/Notices/Notices-rouges/Voir-les-notices-rouges",
         },
         "france":{
@@ -36,6 +36,7 @@ class urls():
             "Politico CyberSecurity":"https://www.politico.eu/?s=Cybedefense",
         },
         "Cyber":{
+            "Qualys": "https://blog.qualys.com/",
             "BleepingComputer": "https://www.bleepingcomputer.com/news/security/",
             "Sansec": "https://sansec.io/research/",
             "Promon": "https://promon.co/app-threat-reports/",

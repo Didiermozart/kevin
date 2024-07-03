@@ -1,3 +1,4 @@
+import os
 import cloudscraper
 import pandas as pd
 import re
@@ -93,7 +94,9 @@ def selenium_scraper(url, type="text"):
 
                 # Enregistrer l'image en tant que fichier JPEG
                 name = url.split('/')[-3]
-                image.save(f'{name}.jpeg', 'JPEG')
+                image_name = f"{name}.jpeg"
+                image.save(image_name, 'JPEG')
+                return image_name
 
             # Get the page HTML
             page_html = driver.page_source
