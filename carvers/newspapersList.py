@@ -28,7 +28,9 @@ class urls():
             "Le Monde": "https://www.lemonde.fr/pixels/",
             "Parquet de Paris": "https://www.linkedin.com/posts"
         },
-
+        "US":{
+            "Cybersecurity Insiders":"https://www.cybersecurity-insiders.com",
+        },
         "monde":{
             "TheRecord": "https://www.therecord.media",
         },
@@ -36,6 +38,14 @@ class urls():
             "Politico CyberSecurity":"https://www.politico.eu/?s=Cybedefense",
         },
         "Cyber":{
+            "ASEC":"https://asec.ahnlab.com/en/",
+            "HarfangLab":"https://harfanglabs.io/insidethelab/",
+            "Zimperium.com": "http://www.zimperium.com/blog/",
+            "Tenable":"https://www.tenable.com/security/",
+            "Eva":"https://www.evasec.io",
+            "fortra":"https://www.fortra.com/security",
+            "Help Net Security":"https://helpnetsecurity.com/{YEAR}/{MONTH}/",
+            "Computing":"https://www.computing.co.uk",
             "Qualys": "https://blog.qualys.com/",
             "BleepingComputer": "https://www.bleepingcomputer.com/news/security/",
             "Sansec": "https://sansec.io/research/",
