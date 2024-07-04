@@ -5,3 +5,5 @@ Pillow
 cloudscraper
 pandas
 ssdeep
+gunicorn
+flask

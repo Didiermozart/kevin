@@ -20,7 +20,22 @@ RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add
     && apt-get update \
     && apt-get install -y google-chrome-stable \
     && wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip \
-    && unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
+    && unzip /tmp/chromedriver.zip chromedriver -d /usr/bin/
+
+
+# Install Google Chrome
+# RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
+#     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
+#     && apt-get update \
+#     && apt-get install -y google-chrome-stable
+
+
+# # Install ChromeDriver
+# RUN CHROME_VERSION=$(google-chrome-stable --version | grep -oP '\d+\.\d+\.\d+') \
+#     && CHROMEDRIVER_VERSION=$(wget -qO- "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}") \
+#     && wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" \
+#     && unzip /tmp/chromedriver.zip -d /usr/local/bin/ \
+#     && rm /tmp/chromedriver.zip
 
 # Définir le répertoire de travail dans le conteneur
 WORKDIR /app
@@ -30,11 +45,15 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copier le reste de l'application
-COPY . .
+# COPY . .
+COPY . /app
 
 # Définir les variables d'environnement pour Chrome
 ENV DISPLAY=:99
 ENV PYTHONPATH /app
 
-# Commande à exécuter pour démarrer l'application
-CMD ["python", "main.py"]
+# Make port 8000 available to the world outside this container
+EXPOSE 8000
+
+# Run app.py when the container launches
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8080", "main:app"]

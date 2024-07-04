@@ -15,10 +15,15 @@ build:
 
 # Créer le réseau Docker
 network:
-	docker network create --subnet=$(SUBNET) $(NETWORK_NAME)
+	docker network create --subnet=$(SUBNET) $(NETWORK_NAME) || true
+
+
+clean-container:
+	docker stop $(CONTAINER_NAME) || true
+	docker rm $(CONTAINER_NAME) || true
 
 # Exécuter le conteneur Docker avec un volume persistant, un réseau et une IP définis
-run: network
+run: network clean-container
 	docker run -d \
 		--name $(CONTAINER_NAME) \
 		-p $(HOST_PORT):$(CONTAINER_PORT) \
@@ -26,6 +31,7 @@ run: network
 		--network $(NETWORK_NAME) \
 		--ip $(IP_ADDRESS) \
 		$(IMAGE_NAME)
+
 
 # Arrêter et supprimer le conteneur Docker
 clean:
@@ -39,3 +45,12 @@ prune: clean
 # Supprimer le réseau Docker
 network-clean:
 	docker network rm $(NETWORK_NAME)
+
+# View the logs of the running container
+logs:
+	docker logs -f $(CONTAINER_NAME)
+
+export:
+	docker save -o $(CONTAINER_NAME).tar $(CONTAINER_NAME)
+
+

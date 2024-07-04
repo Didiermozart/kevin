@@ -7,11 +7,25 @@ import time
 import requests
 import json
 
+
+import os
+import zlib
+import time
+import queue
+import logging
+import threading
+import requests
+from requests.exceptions import ProxyError, ConnectionError, Timeout
+import sqlite3
+import random
+import cloudscraper
+import hashlib
+import ssdeep
+from datetime import datetime, timedelta
+from bs4 import BeautifulSoup
 from PIL import Image
 import io
-
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from requests.exceptions import ProxyError, ConnectionError, Timeout
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -38,13 +52,118 @@ SCREENSHOT = True
 
 USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 
+class Proxy():
+    def _create_proxy_table(self):
+        with self.lock:
+            self.cursor.execute('''CREATE TABLE IF NOT EXISTS proxies
+                        (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        proxy TEXT UNIQUE)''')
+            self.conn.commit()
 
-"""
-https://spys.me/proxy.txt
-"""
+    def _create_cache_table(self):
+        with self.lock:
+            self.cursor.execute('''CREATE TABLE IF NOT EXISTS cache
+                        (url TEXT PRIMARY KEY,
+                        content BLOB,
+                        timestamp DATETIME,
+                        md5 TEXT,
+                        ssdeep TEXT)''')
+            self.conn.commit()
+    
+    def delete_old_cache_entries(self, days=777):
+        threshold_date = datetime.now() - timedelta(days=days)
+        with self.lock:
+            self.cursor.execute("DELETE FROM cache WHERE timestamp < ?", (threshold_date,))
+            self.conn.commit()
+            logger.info(f"Deleted cache entries older than {days} days")
+
+    def _get_random_proxy(self, cursor):
+        cursor.execute("SELECT proxy FROM proxies ORDER BY RANDOM() LIMIT 1")
+        result = cursor.fetchone()
+        return result[0] if result else None
+    
+    def start_cleaning(self):
+        def run_cleaning():
+            try:
+                with sqlite3.connect('proxies.db', check_same_thread=False) as conn:
+                    cursor = conn.cursor()
+                    self.clean(conn, cursor)
+            except Exception as e:
+                logger.error(f"Exception in cleaning thread: {e}", exc_info=True)
+
+        try:
+            self.doclean = True
+            self.cleaning_thread = threading.Thread(target=run_cleaning)
+            self.cleaning_thread.start()
+        except Exception as e:
+            logger.error(f"Failed to start cleaning thread: {e}")
 
 
-# url = "https://www.proxynova.com/proxy-server-list/country-id/"
+class SeleniumProxy(Proxy):
+    TIMEOUT = 3
+    DELAY = 0.3  # delay 1
+    CACHE_EXPIRY_HOURS = 24
+    doclean = False
+
+    def __init__(self, proxy_on=False, timeout: int = TIMEOUT, caching=True) -> None:
+        self.proxy_on = proxy_on
+        self.caching = caching
+        logger.info("Initializing proxy manager")
+        self.timeout = timeout
+        self.proxy_queue = queue.Queue()
+        self.conn = sqlite3.connect('proxies.db', check_same_thread=False)
+        self.cursor = self.conn.cursor()
+        self.lock = threading.Lock()
+        self._create_proxy_table()
+        self._create_cache_table()
+
+
+    # def _create_proxy_table(self):
+    #     with self.lock:
+    #         self.cursor.execute('''CREATE TABLE IF NOT EXISTS proxies
+    #                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
+    #                     proxy TEXT UNIQUE)''')
+    #         self.conn.commit()
+
+    def _create_cache_table(self):
+        with self.lock:
+            self.cursor.execute('''CREATE TABLE IF NOT EXISTS cache
+                        (url TEXT PRIMARY KEY,
+                        content BLOB,
+                        timestamp DATETIME,
+                        md5 TEXT,
+                        ssdeep TEXT)''')
+            self.conn.commit()
+    
+    def delete_old_cache_entries(self, days=777):
+        threshold_date = datetime.now() - timedelta(days=days)
+        with self.lock:
+            self.cursor.execute("DELETE FROM cache WHERE timestamp < ?", (threshold_date,))
+            self.conn.commit()
+            logger.info(f"Deleted cache entries older than {days} days")
+
+    def _get_random_proxy(self, cursor):
+        cursor.execute("SELECT proxy FROM proxies ORDER BY RANDOM() LIMIT 1")
+        result = cursor.fetchone()
+        return result[0] if result else None
+    
+    def start_cleaning(self):
+        def run_cleaning():
+            try:
+                with sqlite3.connect('proxies.db', check_same_thread=False) as conn:
+                    cursor = conn.cursor()
+                    self.clean(conn, cursor)
+            except Exception as e:
+                logger.error(f"Exception in cleaning thread: {e}", exc_info=True)
+
+        try:
+            self.doclean = True
+            self.cleaning_thread = threading.Thread(target=run_cleaning)
+            self.cleaning_thread.start()
+        except Exception as e:
+            logger.error(f"Failed to start cleaning thread: {e}")
+
+        
 
 def selenium_scraper(url, type="text"):
     # Create a CloudScraper instance

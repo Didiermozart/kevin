@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des pays</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .country-list {
+            list-style-type: none;
+            padding: 0;
+            max-width: 600px;
+            margin: auto;
+        }
+        .country-list li {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Liste des pays</h1>
+    <ul class="country-list" id="countryList">
+        {% for country in countries %}
+            <li>{{ country['flag'] }} {{ country['name']}} {{country['code']}}</li>
+            red list : 
+            <a href="https://ws-public.interpol.int/notices/v1/red?nationality={{country['code']}}&resultPerPage=160&page=1">red list</a>
+            yellow list : 
+            <a href="https://ws-public.interpol.int/notices/v1/yellow?nationality={{country['code']}}&resultPerPage=160&page=1">yellow list</a>
+      
+            {% endfor %}
+    </ul>
+</body>
+</html>

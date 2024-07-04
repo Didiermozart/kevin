@@ -216,6 +216,6 @@ class urls():
         return {"md5":distinct_md5_hashes, "sha1": distinct_sha1_hashes, "sha256":distinct_sha256_hashes}
 
 
-catalog = urls()
-catalog.downlowd_rootpage()
-catalog.get_articles()
+# catalog = urls()
+# catalog.downlowd_rootpage()
+# catalog.get_articles()
